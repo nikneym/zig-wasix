@@ -15,6 +15,12 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const wasix_module = b.createModule(.{
+        .source_file = .{ .path = "src/main.zig" },
+    });
+
+    try b.modules.put(b.dupe("wasix"), wasix_module);
+
     const lib = b.addStaticLibrary(.{
         .name = "wasix",
         // In this case the main source file is merely a path, however, in more
