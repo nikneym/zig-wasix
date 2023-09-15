@@ -35,19 +35,21 @@ pub fn build(b: *std.Build) !void {
     // running `zig build`).
     b.installArtifact(lib);
 
-    // Creates a step for unit testing. This only builds the test executable
-    // but does not run it.
-    const main_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+    // In order to test, we output a .wasm file that can be run with wasmer.
+    // zig build -Dtarget=wasm32-wasi
+    const main_tests = b.addExecutable(.{
+        .name = "wasix-test",
+        .root_source_file = .{ .path = "src/test.zig" },
         .target = target,
         .optimize = optimize,
     });
 
-    const run_main_tests = b.addRunArtifact(main_tests);
+    b.installArtifact(main_tests);
+    //const run_main_tests = b.addRunArtifact(main_tests);
 
     // This creates a build step. It will be visible in the `zig build --help` menu,
     // and can be selected like this: `zig build test`
     // This will evaluate the `test` step rather than the default, which is "install".
-    const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&run_main_tests.step);
+    //const test_step = b.step("test", "Run library tests");
+    //test_step.dependOn(&run_main_tests.step);
 }
