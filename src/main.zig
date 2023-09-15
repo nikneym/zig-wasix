@@ -87,13 +87,6 @@ const addr_ip6_t = extern struct {
     h1: u16,
     h2: u16,
     h3: u16,
-    // flow_info1 contains the most significant two bytes, and comes first in keeping with all wasix syscalls being little endian
-    flow_info1: u16,
-    // flow_info0 contains the least significant two bytes
-    flow_info0: u16,
-    // Same as flow_info1 and flow_info0
-    scope_id1: u16,
-    scope_id0: u16,
 };
 
 pub const addr_unspec_t = extern struct {
@@ -115,7 +108,6 @@ pub const addr_ip6_port_t = extern struct {
     addr: addr_ip6_t,
 };
 
-// Unix socket that is bound to no more than 107 bytes
 pub const addr_unix_t = extern struct {
     b0: u8,
     b1: u8,
@@ -133,98 +125,6 @@ pub const addr_unix_t = extern struct {
     b13: u8,
     b14: u8,
     b15: u8,
-    b16: u8,
-    b17: u8,
-    b18: u8,
-    b19: u8,
-    b20: u8,
-    b21: u8,
-    b22: u8,
-    b23: u8,
-    b24: u8,
-    b25: u8,
-    b26: u8,
-    b27: u8,
-    b28: u8,
-    b29: u8,
-    b30: u8,
-    b31: u8,
-    b32: u8,
-    b33: u8,
-    b34: u8,
-    b35: u8,
-    b36: u8,
-    b37: u8,
-    b38: u8,
-    b39: u8,
-    b40: u8,
-    b41: u8,
-    b42: u8,
-    b43: u8,
-    b44: u8,
-    b45: u8,
-    b46: u8,
-    b47: u8,
-    b48: u8,
-    b49: u8,
-    b50: u8,
-    b51: u8,
-    b52: u8,
-    b53: u8,
-    b54: u8,
-    b55: u8,
-    b56: u8,
-    b57: u8,
-    b58: u8,
-    b59: u8,
-    b60: u8,
-    b61: u8,
-    b62: u8,
-    b63: u8,
-    b64: u8,
-    b65: u8,
-    b66: u8,
-    b67: u8,
-    b68: u8,
-    b69: u8,
-    b70: u8,
-    b71: u8,
-    b72: u8,
-    b73: u8,
-    b74: u8,
-    b75: u8,
-    b76: u8,
-    b77: u8,
-    b78: u8,
-    b79: u8,
-    b80: u8,
-    b81: u8,
-    b82: u8,
-    b83: u8,
-    b84: u8,
-    b85: u8,
-    b86: u8,
-    b87: u8,
-    b88: u8,
-    b89: u8,
-    b90: u8,
-    b91: u8,
-    b92: u8,
-    b93: u8,
-    b94: u8,
-    b95: u8,
-    b96: u8,
-    b97: u8,
-    b98: u8,
-    b99: u8,
-    b100: u8,
-    b101: u8,
-    b102: u8,
-    b103: u8,
-    b104: u8,
-    b105: u8,
-    b106: u8,
-    b107: u8,
 };
 
 pub const addr_port_u_t = extern union {
@@ -241,7 +141,57 @@ pub const addr_port_t = extern struct {
         inet6 = 2,
         unix = 3,
     },
-    u: addr_port_u_t,
+    u: extern union {
+        unspec: extern struct {
+            port: ip_port_t,
+            addr: extern struct {
+                n0: u8,
+            },
+        },
+        inet4: extern struct {
+            port: ip_port_t,
+            addr: extern struct {
+                n0: u8,
+                n1: u8,
+                h0: u8,
+                h1: u8,
+            },
+        },
+        inet6: extern struct {
+            port: ip_port_t,
+            addr: extern struct {
+                n0: u8,
+                n1: u8,
+                n2: u8,
+                n3: u8,
+                h0: u8,
+                h1: u8,
+                h2: u8,
+                h3: u8,
+            },
+        },
+        unix: extern struct {
+            port: ip_port_t,
+            addr: extern struct {
+                b0: u8,
+                b1: u8,
+                b2: u8,
+                b3: u8,
+                b4: u8,
+                b5: u8,
+                b6: u8,
+                b7: u8,
+                b8: u8,
+                b9: u8,
+                b10: u8,
+                b11: u8,
+                b12: u8,
+                b13: u8,
+                b14: u8,
+                b15: u8,
+            },
+        },
+    },
 };
 
 pub const addr_u_t = extern union {
@@ -347,7 +297,7 @@ pub extern "wasix_32v1" fn sock_join_multicast_v4(sock: w.fd_t, multiaddr: *cons
 pub extern "wasix_32v1" fn sock_leave_multicast_v4(sock: w.fd_t, multiaddr: *const addr_ip4_t, iface: *const addr_ip4_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_join_multicast_v6(sock: w.fd_t, multiaddr: *const addr_ip6_t, iface: u32) w.errno_t;
 pub extern "wasix_32v1" fn sock_leave_multicast_v6(sock: w.fd_t, multiaddr: *const addr_ip6_t, iface: u32) w.errno_t;
-pub extern "wasix_32v1" fn sock_bind(sock: w.fd_t, addr: *addr_port_t) w.errno_t;
+pub extern "wasix_32v1" fn sock_bind(sock: w.fd_t, addr: *const addr_port_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_listen(sock: w.fd_t, backlog: usize) w.errno_t;
 pub extern "wasix_32v1" fn sock_accept_v2(sock: w.fd_t, fd_flags: w.fdflags_t, ro_fd: *w.fd_t, ro_addr: *addr_port_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_connect(sock: w.fd_t, addr: *const addr_port_t) w.errno_t;
