@@ -160,14 +160,14 @@ pub const addr_port_t = extern struct {
         inet6: extern struct {
             port: ip_port_t,
             addr: extern struct {
-                n0: u8,
-                n1: u8,
-                n2: u8,
-                n3: u8,
-                h0: u8,
-                h1: u8,
-                h2: u8,
-                h3: u8,
+                n0: u16,
+                n1: u16,
+                n2: u16,
+                n3: u16,
+                h0: u16,
+                h1: u16,
+                h2: u16,
+                h3: u16,
             },
         },
         unix: extern struct {
@@ -209,6 +209,58 @@ pub const addr_t = extern struct {
         unix = 3,
     },
     u: addr_u_t,
+};
+
+pub const AddressFamily = enum(address_family_t) {
+    unspec,
+    inet4,
+    inet6,
+    unix,
+};
+
+pub const SockType = enum(sock_type_t) {
+    unused,
+    stream,
+    datagram,
+    raw,
+    seqpacket,
+};
+
+pub const SockProto = enum(sock_proto_t) {
+    ip = 0,
+    icmp = 1,
+    igmp = 2,
+    ipip = 4,
+    tcp = 6,
+    egp = 8,
+    pup = 12,
+    udp = 17,
+    idp = 22,
+    dccp = 33,
+    ipv6 = 41,
+    routing = 43,
+    fragment = 44,
+    rsvp = 46,
+    gre = 47,
+    esp = 50,
+    ah = 51,
+    icmpv6 = 58,
+    none = 59,
+    dstopts = 60,
+    mtp = 92,
+    beetph = 94,
+    encap = 98,
+    pim = 103,
+    comp = 108,
+    sctp = 132,
+    mh = 135,
+    udplite = 136,
+    mpls = 137,
+    ethernet = 143,
+    raw = 255,
+    mptcp = 262,
+    max = 263,
+    _,
 };
 
 pub const tty_t = extern struct {
@@ -286,7 +338,7 @@ pub extern "wasix_32v1" fn thread_exit(rval: w.exitcode_t) noreturn;
 // TODO: add stack functions here
 
 // socket
-pub extern "wasix_32v1" fn sock_open(af: address_family_t, ty: sock_type_t, pt: sock_proto_t, ro_sock: *w.fd_t) w.errno_t;
+pub extern "wasix_32v1" fn sock_open(af: AddressFamily, ty: SockType, pt: SockProto, ro_sock: *w.fd_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_set_opt_flag(sock: w.fd_t, opt: sock_option_t, flag: bool_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_get_opt_flag(sock: w.fd_t, opt: sock_option_t, ret_flag: *bool_t) w.errno_t;
 pub extern "wasix_32v1" fn sock_set_opt_time(sock: w.fd_t, opt: sock_option_t, time: *const option_timestamp_t) w.errno_t;
