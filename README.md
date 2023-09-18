@@ -18,7 +18,7 @@ Depend on this library in your project's `build.zig.zon`:
 }
 ```
 In your `build` function at `build.zig`, make sure your build step and source files are aware of `zig-wasix`:
-```ts
+```zig
 const wasix = b.dependency("wasix", .{
     .target = target,
     .optimize = optimize,
