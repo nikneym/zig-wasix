@@ -2,6 +2,9 @@ const std = @import("std");
 const os = std.os;
 const w = os.wasi;
 
+// Higher level wrappers, mostly zero cost!
+pub usingnamespace @import("wrapper.zig");
+
 pub const bool_t = u8;
 
 pub const pointersize_t = u32;
@@ -89,25 +92,6 @@ const addr_ip6_t = extern struct {
     h3: u16,
 };
 
-pub const addr_unspec_t = extern struct {
-    n0: u8,
-};
-
-pub const addr_unspec_port_t = extern struct {
-    port: ip_port_t,
-    addr: addr_unspec_t,
-};
-
-pub const addr_ip4_port_t = extern struct {
-    port: ip_port_t,
-    addr: addr_ip4_t,
-};
-
-pub const addr_ip6_port_t = extern struct {
-    port: ip_port_t,
-    addr: addr_ip6_t,
-};
-
 pub const addr_unix_t = extern struct {
     b0: u8,
     b1: u8,
@@ -127,87 +111,67 @@ pub const addr_unix_t = extern struct {
     b15: u8,
 };
 
+pub const addr_unspec_t = extern struct {
+    n0: u8,
+};
+
+pub const addr_unspec_port_t = extern struct {
+    port: ip_port_t,
+    addr: addr_unspec_t,
+};
+
+pub const addr_ip4_port_t = extern struct {
+    port: ip_port_t,
+    addr: addr_ip4_t,
+};
+
+pub const addr_ip6_port_t = extern struct {
+    port: ip_port_t,
+    addr: addr_ip6_t,
+};
+
+pub const addr_unix_port_t = extern struct {
+    port: ip_port_t,
+    addr: addr_unix_t,
+};
+
 pub const addr_port_u_t = extern union {
     unspec: addr_unspec_port_t,
     inet4: addr_ip4_port_t,
     inet6: addr_ip6_port_t,
-    unix: addr_unix_t,
+    unix: addr_unix_port_t,
+};
+
+pub const addr_tag_t = enum(u8) {
+    unspec,
+    inet4,
+    inet6,
+    unix,
+
+    pub fn name(tag: addr_tag_t) []const u8 {
+        return switch (tag) {
+            .unspec => "unspec",
+            .inet4 => "inet4",
+            .inet6 => "inet6",
+            .unix => "unix",
+        };
+    }
 };
 
 pub const addr_port_t = extern struct {
-    tag: enum(u8) {
-        unspec = 0,
-        inet4 = 1,
-        inet6 = 2,
-        unix = 3,
-    },
-    u: extern union {
-        unspec: extern struct {
-            port: ip_port_t,
-            addr: extern struct {
-                n0: u8,
-            },
-        },
-        inet4: extern struct {
-            port: ip_port_t,
-            addr: extern struct {
-                n0: u8,
-                n1: u8,
-                h0: u8,
-                h1: u8,
-            },
-        },
-        inet6: extern struct {
-            port: ip_port_t,
-            addr: extern struct {
-                n0: u16,
-                n1: u16,
-                n2: u16,
-                n3: u16,
-                h0: u16,
-                h1: u16,
-                h2: u16,
-                h3: u16,
-            },
-        },
-        unix: extern struct {
-            port: ip_port_t,
-            addr: extern struct {
-                b0: u8,
-                b1: u8,
-                b2: u8,
-                b3: u8,
-                b4: u8,
-                b5: u8,
-                b6: u8,
-                b7: u8,
-                b8: u8,
-                b9: u8,
-                b10: u8,
-                b11: u8,
-                b12: u8,
-                b13: u8,
-                b14: u8,
-                b15: u8,
-            },
-        },
-    },
+    tag: addr_tag_t,
+    u: addr_port_u_t,
 };
 
 pub const addr_u_t = extern union {
     unspec: addr_unspec_port_t,
     inet4: addr_ip4_port_t,
     inet6: addr_ip6_port_t,
-    unix: addr_unix_t,
+    unix: addr_unix_port_t,
 };
 
 pub const addr_t = extern struct {
-    tag: enum(u8) {
-        unspec = 0,
-        inet4 = 1,
-        inet6 = 2,
-        unix = 3,
-    },
+    tag: addr_tag_t,
     u: addr_u_t,
 };
 
