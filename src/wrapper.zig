@@ -102,8 +102,14 @@ pub const Socket = enum(w.fd_t) {
         return os.write(@intFromEnum(socket), bytes);
     }
 
+    pub fn readv(socket: Socket, iov: []const os.iovec) os.ReadError!usize {
+        return os.readv(@intFromEnum(socket), iov);
+    }
+
+    pub fn writev(socket: Socket, iov: []const os.iovec_const) os.WriteError!usize {
+        return os.writev(@intFromEnum(socket), iov);
+    }
+
     // TODO: implement recv
     // TODO: implement send
-    // TODO: implement readv
-    // TODO: implement writev
 };
