@@ -136,3 +136,35 @@ pub const Socket = enum(w.fd_t) {
     // TODO: implement recv
     // TODO: implement send
 };
+
+pub const Dns = struct {
+    pub fn resolve(host: []const u8, port: u16, addrs: []wx.addr_t) !usize {
+        var naddrs: usize = 0;
+        const e = wx.resolve(host.ptr, host.len, port, addrs.ptr, addrs.len, &naddrs);
+
+        return switch (e) {
+            .SUCCESS => naddrs,
+            .ACCES => error.PermissionDenied,
+            .PERM => error.PermissionDenied,
+            .ADDRINUSE => error.AddressInUse,
+            .ADDRNOTAVAIL => error.AddressNotAvailable,
+            .AFNOSUPPORT => error.AddressFamilyNotSupported,
+            .AGAIN, .INPROGRESS => error.WouldBlock,
+            .ALREADY => error.ConnectionPending,
+            .BADF => unreachable, // sockfd is not a valid open file descriptor.
+            .CONNREFUSED => error.ConnectionRefused,
+            .CONNRESET => error.ConnectionResetByPeer,
+            .FAULT => unreachable, // The socket structure address is outside the user's address space.
+            .INTR => error.Interrupted,
+            .ISCONN => unreachable, // The socket is already connected.
+            .HOSTUNREACH => error.NetworkUnreachable,
+            .NETUNREACH => error.NetworkUnreachable,
+            .NOTSOCK => unreachable, // The file descriptor sockfd does not refer to a socket.
+            .PROTOTYPE => unreachable, // The socket type does not support the requested communications protocol.
+            .TIMEDOUT => error.ConnectionTimedOut,
+            .NOENT => error.FileNotFound, // Returned when socket is AF.UNIX and the given path does not exist.
+            .CONNABORTED => unreachable, // Tried to reuse socket that previously received error.ConnectionRefused.
+            else => os.unexpectedErrno(e),
+        };
+    }
+};
