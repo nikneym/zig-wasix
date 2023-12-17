@@ -271,6 +271,18 @@ pub const thread_start_t = extern struct {
     guard_size: pointersize_t,
 };
 
+pub const hash_t = extern struct {
+    b0: u64,
+    b1: u64,
+};
+
+pub const stack_snapshot_t = extern struct {
+    user: u64,
+    hash: hash_t,
+};
+
+pub const longsize_t = u64;
+
 // clock
 pub extern "wasix_32v1" fn clock_time_set(id: w.clockid_t, timestamp: w.timestamp_t) w.errno_t;
 
@@ -279,7 +291,7 @@ pub extern "wasix_32v1" fn fd_dup(id: w.fd_t, ret_fd: *w.fd_t) w.errno_t;
 pub extern "wasix_32v1" fn fd_event(initial_val: u64, flags: w.eventrwflags_t, ret_fd: *w.fd_t) w.errno_t;
 pub extern "wasix_32v1" fn fd_pipe(fd1: w.fd_t, fd2: w.fd_t) w.errno_t;
 
-// tty
+// TTY
 pub extern "wasix_32v1" fn tty_get(state: *tty_t) w.errno_t;
 pub extern "wasix_32v1" fn tty_set(state: *tty_t) w.errno_t;
 
@@ -299,7 +311,9 @@ pub extern "wasix_32v1" fn thread_parallelism(ret_parallelism: *usize) w.errno_t
 pub extern "wasix_32v1" fn thread_signal(tid: tid_t, signal: w.signal_t) w.errno_t;
 // TODO: add futex functions here
 pub extern "wasix_32v1" fn thread_exit(rval: w.exitcode_t) noreturn;
+
 // TODO: add stack functions here
+pub extern "wasix_32v1" fn stack_checkpoint(snapshot: *stack_snapshot_t, retptr: *longsize_t) w.errno_t;
 
 // socket
 pub extern "wasix_32v1" fn sock_open(af: AddressFamily, ty: SockType, pt: SockProto, ro_sock: *w.fd_t) w.errno_t;
