@@ -16,7 +16,7 @@ jobs:
           version: 0.14.0-dev.2571+01081cc8e
 
       - name: Setup Wasmer
-        uses: wasmerio/setup-wasmer@v3.1
+        uses: wasmerio/setup-wasmer@v2
         with:
           version: '5.0.4'
 
