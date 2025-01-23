@@ -1,0 +1,26 @@
+name: wasix-test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.14.0
+
+      - name: Setup Wasmer
+        uses: wasmerio/setup-wasmer@v3.1
+        with:
+          version: 5.0.4
+
+      - name: Help
+        run: |
+          zig --help
+          wasmer --help
