@@ -2,9 +2,6 @@ const std = @import("std");
 const os = std.os;
 const w = os.wasi;
 
-// Higher level wrappers, mostly zero cost!
-pub usingnamespace @import("wrapper.zig");
-
 pub const bool_t = u8;
 
 pub const pointersize_t = u32;
@@ -21,28 +18,28 @@ pub const sock_option_t = u8;
 
 pub const epoll_ctl_t = u32;
 
-pub const CTL = enum(epoll_ctl_t) {
-    ADD = 0,
-    MOD = 1,
-    DEL = 2,
+pub const CTL = struct {
+    pub const ADD = 1;
+    pub const MOD = 2;
+    pub const DEL = 3;
 };
 
 pub const epoll_type_t = u32;
 
-pub const EPOLL = enum(epoll_type_t) {
-    IN = 1 << 0,
-    OUT = 1 << 1,
-    RDHUP = 1 << 2,
-    PRI = 1 << 3,
-    ERR = 1 << 4,
-    HUP = 1 << 5,
-    ET = 1 << 6,
-    ONESHOT = 1 << 7,
+pub const EPOLL = struct {
+    pub const IN = 0x001;
+    pub const OUT = 0x004;
+    pub const RDHUP = 1 << 2;
+    pub const PRI = 1 << 3;
+    pub const ERR = 0x008;
+    pub const HUP = 0x010;
+    pub const ET = (1 << 31);
+    pub const ONESHOT = 1 << 7;
 };
 
 // this is actually defined as union on Linux
 pub const epoll_data_t = extern struct {
-    ptr: pointersize_t,
+    ptr: ?*anyopaque,
     fd: w.fd_t,
     data1: u32,
     data2: u64,
@@ -312,8 +309,8 @@ pub extern "wasix_32v1" fn thread_signal(tid: tid_t, signal: w.signal_t) w.errno
 // TODO: add futex functions here
 pub extern "wasix_32v1" fn thread_exit(rval: w.exitcode_t) noreturn;
 
-// TODO: add stack functions here
-pub extern "wasix_32v1" fn stack_checkpoint(snapshot: *stack_snapshot_t, retptr: *longsize_t) w.errno_t;
+// NOTE: has bugs, disabled
+//pub extern "wasix_32v1" fn stack_checkpoint(snapshot: *stack_snapshot_t, retptr: *longsize_t) w.errno_t;
 
 // socket
 pub extern "wasix_32v1" fn sock_open(af: AddressFamily, ty: SockType, pt: SockProto, ro_sock: *w.fd_t) w.errno_t;
