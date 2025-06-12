@@ -16,10 +16,11 @@ pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{});
 
     // Expose zig-wasix as a module.
-    _ = b.addModule("wasix", .{
+    const wasix_mod = b.addModule("wasix", .{
         .root_source_file = b.path("src/root.zig"),
         .imports = &.{},
     });
+    _ = wasix_mod;
 
     // In order to test, we output a .wasm file that can be run with wasmer.
     // zig build -Dtarget=wasm32-wasi

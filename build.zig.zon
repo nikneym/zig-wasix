@@ -1,6 +1,7 @@
 .{
     .paths = .{""},
-    .name = "wasix",
-    .version = "0.2.0",
+    .name = .wasix,
+    .fingerprint = 0xb21ca44d055afd21,
+    .version = "0.3.0",
     .dependencies = .{},
 }
