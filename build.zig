@@ -26,10 +26,16 @@ pub fn build(b: *std.Build) !void {
     // zig build -Dtarget=wasm32-wasi
     const main_tests = b.addExecutable(.{
         .name = "wasix-test",
-        .root_source_file = b.path("src/test.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/test.zig"),
+            .link_libc = true,
+            .target = target,
+            .optimize = optimize,
+        }),
     });
+    // Required so wasmer's context_create can resolve funcref entrypoints
+    // by index out of the indirect function table.
+    main_tests.export_table = true;
 
     b.installArtifact(main_tests);
 }
